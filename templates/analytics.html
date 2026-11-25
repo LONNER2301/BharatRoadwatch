@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Data analytics{% endblock %}
+{% block page_heading %}Data analytics <span class="heading-muted">/ AI & DS lab</span>{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><span class="section-kicker">STATISTICAL INTELLIGENCE</span><h1>India-wide road intelligence.</h1><p>State-wise and city-wise statistical analysis of pothole reports across India.</p></div><span class="analysis-badge">PYTHON · PANDAS · NUMPY</span></div>
+<div class="stat-grid compact-stats">
+  <div class="stat-card"><span class="muted">Mean depth</span><strong>{{ stats.avg_depth }}<em> cm</em></strong><small>Arithmetic average</small></div>
+  <div class="stat-card"><span class="muted">Median depth</span><strong>{{ stats.median_depth }}<em> cm</em></strong><small>50th percentile</small></div>
+  <div class="stat-card"><span class="muted">Standard deviation</span><strong>{{ stats.std_depth }}<em> cm</em></strong><small>Depth dispersion</small></div>
+  <div class="stat-card"><span class="muted">Mean severity</span><strong>{{ stats.mean_severity }}<em> / 3</em></strong><small>Ordinal score average</small></div>
+</div>
+<div class="content-grid">
+  <div class="panel chart-panel"><div class="panel-head"><div><h3>Reports by state / UT</h3><p>National frequency distribution</p></div><span class="chart-chip">STATE-WISE</span></div><div class="chart-box"><canvas id="stateChart"></canvas></div></div>
+  <div class="panel chart-panel"><div class="panel-head"><div><h3>Reports by area</h3><p>Frequency distribution across localities</p></div><span class="chart-chip">GROUPBY</span></div><div class="chart-box"><canvas id="areaChart"></canvas></div></div>
+  <div class="panel chart-panel"><div class="panel-head"><div><h3>Monthly trend</h3><p>Report count by month</p></div><span class="chart-chip">TIME SERIES</span></div><div class="chart-box"><canvas id="monthChart"></canvas></div></div>
+</div>
+<div class="panel hotspot-panel">
+  <div class="panel-head"><div><h3>Area risk ranking</h3><p>Composite index based on severity, mean depth and report frequency</p></div><span class="chart-chip">EXPLORATORY MODEL</span></div>
+  {% for h in stats.hotspots %}
+  <div class="risk-row"><div class="risk-place"><b>{{ '%02d'|format(loop.index) }}</b><span>{{ h.area }} <small>{{ h.city }}, {{ h.state }}</small></span></div><div class="risk-track"><i style="width:{{ h.risk }}%"></i></div><div class="risk-score">{{ h.risk }} <small>/ 100</small></div><div class="risk-count">{{ h.reports }} reports</div></div>
+  {% else %}<p class="muted">No data available yet.</p>{% endfor %}
+</div>
+<div class="content-grid">
+  <div class="panel method-panel"><div class="panel-head"><div><h3>Statistical methods used</h3><p>What the backend calculates</p></div></div>
+    <div class="method-item"><span>01</span><div><b>Central tendency</b><p>Mean and median estimate the typical reported pothole depth.</p></div></div>
+    <div class="method-item"><span>02</span><div><b>Dispersion</b><p>Population standard deviation measures variation in reported depth.</p></div></div>
+    <div class="method-item"><span>03</span><div><b>Frequency distribution</b><p>Counts reports by severity and area to identify common patterns.</p></div></div>
+    <div class="method-item"><span>04</span><div><b>Correlation</b><p>Pearson correlation explores the relationship between depth and severity score.</p></div></div>
+    <div class="method-item"><span>05</span><div><b>Linear trend</b><p>A least-squares line estimates the direction of monthly report-count change.</p></div></div>
+  </div>
+  <div class="panel insight-panel"><div class="insight-heading"><span class="spark">✳</span><div><h3>Model interpretation</h3><p>Current dataset summary</p></div></div>
+    <div class="insight-main">{{ stats.insight }}</div>
+    <div class="insight-metrics">
+      <div><small>Pearson r (depth vs severity)</small><b>{{ stats.correlation if stats.correlation is not none else 'N/A' }}</b></div>
+      <div><small>Monthly trend slope</small><b>{{ stats.trend_slope }} reports / month</b></div>
+      <div><small>Resolution rate</small><b>{{ stats.resolution_rate }}%</b></div>
+    </div>
+    <p class="method-note">The risk index is a transparent heuristic for academic demonstration, not a validated engineering or safety standard. Correlation does not imply causation.</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+makeBarChart('stateChart', {{ stats.state_labels|tojson }}, {{ stats.state_values|tojson }});
+makeBarChart('areaChart', {{ stats.area_labels|tojson }}, {{ stats.area_values|tojson }});
+makeLineChart('monthChart', {{ stats.month_labels|tojson }}, {{ stats.month_values|tojson }});
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}All reports{% endblock %}
+{% block page_heading %}All reports <span class="heading-muted">/ Issue register</span>{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><h1>Road issue register</h1><p>Review citizen-submitted road reports from states and union territories across India.</p></div><a class="btn btn-primary" href="{{ url_for('report') }}">＋ New report</a></div>
+<div class="panel">
+  <div class="panel-head"><div><h3>All submissions</h3><p>{{ reports|length }} records in the dataset</p></div><input id="reportSearch" class="search-input" placeholder="Search reports..."></div>
+  <div class="table-wrap"><table id="reportsTable"><thead><tr><th>REPORT</th><th>INDIAN LOCATION</th><th>DEPTH</th><th>SEVERITY</th><th>STATUS</th><th>REPORTED BY</th></tr></thead><tbody>
+  {% for r in reports %}<tr><td><b>{{ r.title }}</b><small>#{{ r.id }} · {{ r.created_at[:10] }}{% if r.is_demo %} · Demo{% endif %}</small></td><td>{{ r.area }}, {{ r.city }}<small>{{ r.district }}, {{ r.state }} · PIN {{ r.pincode }} · {{ r.road }}</small></td><td>{{ r.depth_cm }} cm</td><td><span class="severity {{ r.severity|lower }}">{{ r.severity }}</span></td><td>
+  {% if user and user.role == 'admin' %}<form class="inline-status" method="POST" action="{{ url_for('update_report', report_id=r.id) }}"><select name="status" onchange="this.form.submit()"><option {% if r.status=='Submitted' %}selected{% endif %}>Submitted</option><option {% if r.status=='In Progress' %}selected{% endif %}>In Progress</option><option {% if r.status=='Resolved' %}selected{% endif %}>Resolved</option></select></form>{% else %}<span class="status {{ r.status|lower|replace(' ','-') }}">{{ r.status }}</span>{% endif %}</td><td>{{ r.reporter }}</td></tr>{% else %}<tr><td colspan="6">No reports found.</td></tr>{% endfor %}
+  </tbody></table></div>
+</div>
+{% endblock %}

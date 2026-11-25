@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_heading %}Overview <span class="heading-muted">/ Live dashboard</span>{% endblock %}
+{% block content %}
+<div class="welcome-row">
+  <div><h1>Namaste. <span class="text-gradient">Let's make Indian roads safer.</span></h1><p>Monitor road damage across Indian states, analyse local patterns and support faster repairs.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('report') }}">＋ Submit a report</a>
+</div>
+<div class="stat-grid">
+  <div class="stat-card"><div class="stat-top"><span>Total reports</span><span class="stat-icon blue">▤</span></div><strong>{{ stats.total }}</strong><small class="muted">All recorded potholes</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Resolved</span><span class="stat-icon green">✓</span></div><strong>{{ stats.resolved }}</strong><small class="positive">{{ stats.resolution_rate }}% resolution rate</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Awaiting action</span><span class="stat-icon orange">◷</span></div><strong>{{ stats.pending }}</strong><small class="muted">Submitted + in progress</small></div>
+  <div class="stat-card"><div class="stat-top"><span>Average depth</span><span class="stat-icon purple">⌁</span></div><strong>{{ stats.avg_depth }}<em> cm</em></strong><small class="muted">Mean reported depth</small></div>
+</div>
+<div class="content-grid">
+  <div class="panel chart-panel">
+    <div class="panel-head"><div><h3>Report activity</h3><p>Monthly reporting trend</p></div><span class="chart-chip">TIME SERIES</span></div>
+    <div class="chart-box"><canvas id="trendChart"></canvas></div>
+  </div>
+  <div class="panel chart-panel">
+    <div class="panel-head"><div><h3>Severity breakdown</h3><p>Distribution by risk level</p></div><span class="chart-chip">FREQUENCY</span></div>
+    <div class="chart-box doughnut-box"><canvas id="severityChart"></canvas></div>
+    <div class="legend-row"><span><i class="dot low"></i>Low</span><span><i class="dot medium"></i>Medium</span><span><i class="dot high"></i>High</span></div>
+  </div>
+</div>
+<div class="content-grid lower-grid">
+  <div class="panel">
+    <div class="panel-head"><div><h3>Recent reports</h3><p>Latest citizen submissions across India</p></div><a class="text-link" href="{{ url_for('reports_page') }}">View all →</a></div>
+    <div class="table-wrap"><table><thead><tr><th>ISSUE</th><th>AREA</th><th>SEVERITY</th><th>STATUS</th></tr></thead><tbody>
+      {% for r in reports %}<tr><td><b>{{ r.title }}</b><small>#{{ r.id }} · {{ r.road }}</small></td><td>{{ r.area }}<small>{{ r.city }}, {{ r.state }}</small></td><td><span class="severity {{ r.severity|lower }}">{{ r.severity }}</span></td><td><span class="status {{ r.status|lower|replace(' ','-') }}">{{ r.status }}</span></td></tr>{% else %}<tr><td colspan="4">No reports yet. Submit the first one.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </div>
+  <div class="panel insight-panel">
+    <div class="insight-heading"><span class="spark">✳</span><div><h3>Statistical insight</h3><p>Generated from current dataset</p></div></div>
+    <div class="insight-main">{{ stats.insight }}</div>
+    <div class="insight-metrics">
+      <div><small>Median depth</small><b>{{ stats.median_depth }} cm</b></div>
+      <div><small>Depth std. deviation</small><b>{{ stats.std_depth }} cm</b></div>
+      <div><small>Mean severity score</small><b>{{ stats.mean_severity }} / 3</b></div>
+    </div>
+    <a class="btn btn-dark-outline full-btn" href="{{ url_for('analytics_page') }}">Explore statistical analysis →</a>
+  </div>
+</div>
+<div class="demo-note">ⓘ Dashboard currently includes a India-wide starter demo dataset. New reports are saved to your local SQLite database.</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const trendLabels = {{ stats.month_labels|tojson }};
+const trendValues = {{ stats.month_values|tojson }};
+const severity = {{ stats.severity_counts|tojson }};
+makeLineChart('trendChart', trendLabels, trendValues);
+makeDoughnutChart('severityChart', [severity.Low, severity.Medium, severity.High]);
+</script>
+{% endblock %}

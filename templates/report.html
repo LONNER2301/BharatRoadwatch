@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Report pothole{% endblock %}
+{% block page_heading %}Report a pothole{% endblock %}
+{% block content %}
+<div class="form-intro"><div><span class="section-kicker">COMMUNITY REPORTING</span><h1>Help India map the problem.</h1><p>Submit the road location using Indian state, district, city, ward and PIN code details.</p></div><div class="form-step">01 <span>/</span> REPORT DETAILS</div></div>
+<form class="panel report-form" method="POST" enctype="multipart/form-data">
+  <div class="form-section-title"><span>01</span><div><b>Issue information</b><small>Describe what you noticed</small></div></div>
+  <div class="form-grid">
+    <label class="field full"><span>Report title *</span><input name="title" required placeholder="e.g. Deep pothole near bus stop"></label>
+    <label class="field"><span>State / Union Territory *</span><select name="state" required><option value="">Select state / UT</option>{% for state in states %}<option value="{{ state }}" {% if state == 'Gujarat' %}selected{% endif %}>{{ state }}</option>{% endfor %}</select></label>
+    <label class="field"><span>District *</span><input name="district" required placeholder="e.g. Ahmedabad"></label>
+    <label class="field"><span>City / Town *</span><input name="city" required placeholder="e.g. Ahmedabad"></label>
+    <label class="field"><span>Municipal ward / zone</span><input name="ward" placeholder="e.g. West Zone / Ward 10"></label>
+    <label class="field"><span>PIN code *</span><input name="pincode" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" required placeholder="6-digit Indian PIN code"></label>
+    <label class="field"><span>Area / locality *</span><input name="area" required placeholder="e.g. Vastrapur"></label>
+    <label class="field full"><span>Road name / landmark *</span><input name="road" required placeholder="e.g. IIM Road"></label>
+    <label class="field"><span>Estimated depth (cm) *</span><input type="number" name="depth_cm" min="0" max="100" step="0.1" required placeholder="e.g. 8.5"></label>
+    <label class="field"><span>Severity *</span><select name="severity"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+    <label class="field full"><span>Description</span><textarea name="description" rows="3" placeholder="Mention size, traffic impact, nearby landmarks..."></textarea></label>
+  </div>
+  <div class="form-divider"></div>
+  <div class="form-section-title"><span>02</span><div><b>Location & evidence</b><small>Indian address details, optional coordinates and image</small></div></div>
+  <div class="form-grid">
+    <label class="field"><span>Latitude</span><input type="number" name="latitude" step="any" placeholder="23.0395"></label>
+    <label class="field"><span>Longitude</span><input type="number" name="longitude" step="any" placeholder="72.5300"></label>
+    <label class="field full"><span>Upload a photo (max 5 MB)</span><input type="file" name="photo" accept=".png,.jpg,.jpeg,.webp"></label>
+  </div>
+  <div class="form-foot"><span class="muted">* Required fields. Indian PIN code must contain 6 digits. Do not put yourself in danger to take a photo.</span><button class="btn btn-primary" type="submit">Submit report <span>→</span></button></div>
+</form>
+{% endblock %}

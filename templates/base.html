@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Pothole Reporter{% endblock %} | Bharat RoadWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">CP</span>
+        <span><b>Bharat RoadWatch</b><small>INDIA ROAD INTELLIGENCE</small></span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="side-nav">
+        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}"><span>▦</span> Overview</a>
+        <a href="{{ url_for('report') }}" class="{% if request.endpoint == 'report' %}active{% endif %}"><span>＋</span> Report pothole</a>
+        <a href="{{ url_for('reports_page') }}" class="{% if request.endpoint == 'reports_page' %}active{% endif %}"><span>☷</span> All reports</a>
+        <a href="{{ url_for('analytics_page') }}" class="{% if request.endpoint == 'analytics_page' %}active{% endif %}"><span>⌁</span> Data analytics</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="ai-card">
+          <div class="ai-icon">✳</div>
+          <b>Safer Indian roads</b>
+          <p>Turning citizen reports into actionable road insights.</p>
+          <span class="mini-tag">AI & DATA SCIENCE</span>
+        </div>
+        <div class="profile-row">
+          <div class="avatar">{{ (user.name[0] if user else 'G')|upper }}</div>
+          <div class="profile-info"><b>{{ user.name if user else 'Guest user' }}</b><small>{{ user.role|title if user else 'Public access' }}</small></div>
+          {% if user %}<a class="logout" href="{{ url_for('logout') }}" title="Sign out">↗</a>{% else %}<a class="logout" href="{{ url_for('login') }}" title="Sign in">→</a>{% endif %}
+        </div>
+      </div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div><span class="eyebrow">INDIA / ROAD SAFETY INTELLIGENCE</span><div class="top-title">{% block page_heading %}Overview{% endblock %}</div></div>
+        <div class="top-actions">
+          <span class="live-dot"></span><span class="live-label">SYSTEM ONLINE</span>
+          <a class="top-user" href="{{ url_for('login') if not user else url_for('logout') }}">{{ 'Sign in' if not user else 'Sign out' }}</a>
+        </div>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-wrap">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      <section class="page-body">{% block content %}{% endblock %}</section>
+      <footer class="footer">Bharat RoadWatch <span>•</span> Pothole reporting & statistical intelligence <span class="footer-right">B.Tech AI & Data Science project · India</span></footer>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
